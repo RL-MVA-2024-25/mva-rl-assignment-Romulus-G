@@ -1,22 +1,25 @@
 from gymnasium.wrappers import TimeLimit
 from env_hiv import HIVPatient
+from fast_env_py import FastHIVPatient
 
-from evaluate import evaluate_HIV
+from evaluate import evaluate_HIV, evaluate_HIV_population
 from replay_buffer import ReplayBuffer
 from copy import deepcopy
-
 import os
+from pathlib import Path
+import random
 import numpy as np
 import torch
 import torch.nn as nn
 
-env = TimeLimit(env=HIVPatient(domain_randomization=False), max_episode_steps=200)
+# env = TimeLimit(env=HIVPatient(domain_randomization=False), max_episode_steps=200)
+env = TimeLimit(env=FastHIVPatient(domain_randomization=False), max_episode_steps=200)
 
 class ProjectAgent:
     def act(self, state, use_random=False):
         with torch.no_grad():
-            self.model(torch.Tensor(state).unsqueeze(0)).argmax().item()
-    
+            return self.model(torch.Tensor(state).unsqueeze(0)).argmax().item()
+
     def save(self, filename):
         path = os.path.join("model_weights", filename)
         torch.save(self.model.state_dict(), path)
@@ -33,27 +36,27 @@ class ProjectAgent:
         return torch.nn.Sequential(
             nn.Linear(dim_state, 256),
             nn.ReLU(),
-            nn.Linear(256, 256),
+            nn.Linear(256, 128),
             nn.ReLU(),            
-            nn.Linear(256, 256),
+            nn.Linear(128, 128),
             nn.ReLU(),            
-            nn.Linear(256, 256),
+            nn.Linear(128, 128),
             nn.ReLU(),            
-            nn.Linear(256, 256),
+            nn.Linear(128, 128),
             nn.ReLU(),            
-            nn.Linear(256, n_actions)
+            nn.Linear(128, n_actions)
             )
 
     def train(self):
         
         # Training parameters.
         gamma = 0.98
-        batch_size = 790
+        batch_size = 700
         learning_rate = 0.001
-        buffer_size = 100000
+        buffer_size = 100_000
         eps_min = 0.02
         eps_max = 1.
-        eps_decay_period = 21000
+        eps_decay_period = 20_000
         eps_delay_decay = 100
         update_target_freq = 400
 
@@ -125,3 +128,18 @@ class ProjectAgent:
         self.model.load_state_dict(self.best_model.state_dict())
         self.save("weights.pt")
         return episode_return
+    
+def seed_everything(seed: int = 42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.cuda.manual_seed_all(seed)
+
+if __name__ == "__main__":
+    seed_everything(seed=42)
+    agent = ProjectAgent()
+    agent.train()
