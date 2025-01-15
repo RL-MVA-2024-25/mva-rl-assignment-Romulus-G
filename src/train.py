@@ -1,6 +1,6 @@
 from gymnasium.wrappers import TimeLimit
 from env_hiv import HIVPatient
-from fast_env_py import FastHIVPatient
+# from fast_env_py import FastHIVPatient
 
 from evaluate import evaluate_HIV, evaluate_HIV_population
 from replay_buffer import ReplayBuffer
@@ -12,8 +12,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-# env = TimeLimit(env=HIVPatient(domain_randomization=False), max_episode_steps=200)
-env = TimeLimit(env=FastHIVPatient(domain_randomization=False), max_episode_steps=200)
+env = TimeLimit(env=HIVPatient(domain_randomization=False), max_episode_steps=200)
+# env = TimeLimit(env=FastHIVPatient(domain_randomization=False), max_episode_steps=200)
 
 class ProjectAgent:
     def act(self, state, use_random=False):

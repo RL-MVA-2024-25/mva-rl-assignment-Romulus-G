@@ -18,4 +18,4 @@ class ReplayBuffer:
         batch = sample(self.data[:self.nb_stored], batch_size)
         return list(map(lambda x:torchTensor(nparray(x)), list(zip(*batch))))
     
-    def __len__(self): return len(self.data)
+    def __len__(self): return self.nb_stored
