@@ -36,15 +36,15 @@ class ProjectAgent:
         return torch.nn.Sequential(
             nn.Linear(dim_state, 256),
             nn.ReLU(),
-            nn.Linear(256, 128),
+            nn.Linear(256, 256),
             nn.ReLU(),            
-            nn.Linear(128, 128),
+            nn.Linear(256, 256),
             nn.ReLU(),            
-            nn.Linear(128, 128),
+            nn.Linear(256, 256),
             nn.ReLU(),            
-            nn.Linear(128, 128),
+            nn.Linear(256, 256),
             nn.ReLU(),            
-            nn.Linear(128, n_actions)
+            nn.Linear(256, n_actions)
             )
 
     def train(self):
