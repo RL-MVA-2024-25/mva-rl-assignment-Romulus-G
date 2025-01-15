@@ -1,6 +1,5 @@
 from gymnasium.wrappers import TimeLimit
 from env_hiv import HIVPatient
-# from fast_env_py import FastHIVPatient
 
 from evaluate import evaluate_HIV, evaluate_HIV_population
 from replay_buffer import ReplayBuffer
@@ -13,7 +12,6 @@ import torch
 import torch.nn as nn
 
 env = TimeLimit(env=HIVPatient(domain_randomization=False), max_episode_steps=200)
-# env = TimeLimit(env=FastHIVPatient(domain_randomization=False), max_episode_steps=200)
 
 class ProjectAgent:
     def act(self, state, use_random=False):
@@ -134,10 +132,6 @@ def seed_everything(seed: int = 42):
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    torch.cuda.manual_seed_all(seed)
 
 if __name__ == "__main__":
     seed_everything(seed=42)
